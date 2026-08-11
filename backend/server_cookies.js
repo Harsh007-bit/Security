@@ -5,6 +5,7 @@ const cors = require("cors");
 const crypto = require("crypto");
 
 const cookieParser = require("cookie-parser");
+const { measureMemory } = require("vm");
 const user = {
   email: "harsh@gmail.com",
   password: "1234",
@@ -31,6 +32,7 @@ app.post("/login", (req, res) => {
     session[sessionId] = {
       user,
       expiresAt: validSession,
+      role:'admin'
     };
 
     res.cookie("token", sessionId, {
@@ -82,6 +84,23 @@ app.post("/logout", (req, res) => {
     });
   }
 });
+
+app.get('/admin',(req,res)=>{
+  if(req.cookies.token){
+    if(session[req.cookies.token].role === 'admin'){
+      return res.status(200).json({
+        message: 'admin access'
+      })
+    }
+    else{
+      return res.status(200).json({message: 'Not authorised to be admin'})
+    }
+  }else{
+    return res.status(200).json({
+      message:'invalid token'
+    })
+  }
+})
 app.listen(5000, () => {
   console.log("port started on localhost 500");
 });

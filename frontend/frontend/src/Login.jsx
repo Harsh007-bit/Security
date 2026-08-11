@@ -34,6 +34,13 @@
       })
     }
 
+
+    function adminButtonCall(){
+      fetch('http://localhost:5000/admin',{
+        credentials: 'include'
+      })
+    }
+
     return (
       <>
         <form onSubmit={(e) => submitHandler(e)}>
@@ -55,6 +62,12 @@
 
         <button onClick={profileButtonCall}>
           Profile 
+        </button>
+
+
+
+        <button onClick={adminButtonCall}>
+          Admin 
         </button>
       </>
     );
