@@ -101,6 +101,6 @@ app.get('/admin',(req,res)=>{
     })
   }
 })
-app.listen(5000, () => {
-  console.log("port started on localhost 500");
-});
+// app.listen(5000, () => {
+//   console.log("port started on localhost 500");
+// });
