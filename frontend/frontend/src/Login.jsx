@@ -16,11 +16,22 @@
         fetch("http://localhost:5000/login", {
           method: "POST",
           body: JSON.stringify(payload),
+          credentials: 'include',
           headers: { "Content-Type": "application/json" },
         });
       } catch {
         throw Error();
       }
+    }
+
+    function profileButtonCall(){
+
+      console.log("hello----------")
+      fetch ('http://localhost:5000/profile',{
+        method: 'GET',
+        credentials: 'include'
+
+      })
     }
 
     return (
@@ -40,6 +51,11 @@
           Password
           <button>Submitt</button>
         </form>
+
+
+        <button onClick={profileButtonCall}>
+          Profile 
+        </button>
       </>
     );
   }
