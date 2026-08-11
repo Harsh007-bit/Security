@@ -2,7 +2,8 @@ import { useState } from "react";
 export default function JWTLogin() {
   const [email, setEmail] = useState("");
   const [pswrd, setPswrd] = useState("");
-  const [auth, setAuth] = useState('')
+  const [auth, setAuth] = useState("");
+
 
   function submitHandler(e) {
     e.preventDefault();
@@ -15,17 +16,31 @@ export default function JWTLogin() {
       method: "POST",
       body: JSON.stringify(payload),
       headers: { "Content-Type": "application/json" },
-    }).then((res)=> res.json())
-    .then((data)=>  setAuth(data.token)).catch((err)=> err);
+      credentials:'include'
+    })
+      .then((res) => res.json())
+      .then((data) => setAuth(data.token))
+      .catch((err) => err);
   }
 
-  function profileAccessHandler(){
-    fetch("http://localhost:5000/profile",{
-        method:'GET',
-        headers:{
-            Authorization: `Bearer ${auth}`
-        }
-    })
+  async function profileAccessHandler() {
+    const profileData = await fetch("http://localhost:5000/profile", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${auth}`,
+      },
+    });
+    if(profileData.status==401){
+        fetch("http://localhost:5000/refresh",{
+            method:'POST',
+            credentials: 'include',
+            
+
+        })
+    }
+
+
+    console.log(profileData)
   }
 
   return (
