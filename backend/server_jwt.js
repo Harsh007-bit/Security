@@ -2,6 +2,8 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
+const crypto = require('crypto')
+
 
 const app = express();
 const cors = require("cors");
@@ -20,6 +22,8 @@ const user = {
   email: "harsh@gmail.com",
   pswrd: "1234",
 };
+
+let validRefreshTokenJti = null;
 app.post("/login", (req, res) => {
   if (
     req.body.email &&
@@ -36,7 +40,11 @@ app.post("/login", (req, res) => {
     });
     const refreshToken = jwt.sign(payload, process.env.JWT_TOKEN, {
       expiresIn: "525960m",
+      jwtid: crypto.randomUUID()
     });
+
+    const decodedRefreshToken = jwt.decode(refreshToken);
+    validRefreshTokenJti = decodedRefreshToken.jti;
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -64,6 +72,12 @@ app.post("/refresh", (req, res) => {
     }
 
     const decoded = jwt.verify(oldRefreshToken, process.env.JWT_TOKEN);
+    if (decoded.jti !== validRefreshTokenJti) {
+      return res.status(401).json({
+        message: "Refresh token has already been used",
+      });
+    }
+    validRefreshTokenJti = null;
 
     const payload = {
       email: decoded.email,
@@ -76,7 +90,11 @@ app.post("/refresh", (req, res) => {
 
     const newRefreshToken = jwt.sign(payload, process.env.JWT_TOKEN, {
       expiresIn: "525960m",
+      jwtid: crypto.randomUUID()
     });
+
+    const newDecodedRefreshToken = jwt.decode(newRefreshToken);
+    validRefreshTokenJti = newDecodedRefreshToken.jti;
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,

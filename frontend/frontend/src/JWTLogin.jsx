@@ -4,7 +4,6 @@ export default function JWTLogin() {
   const [pswrd, setPswrd] = useState("");
   const [auth, setAuth] = useState("");
 
-
   function submitHandler(e) {
     e.preventDefault();
 
@@ -16,7 +15,7 @@ export default function JWTLogin() {
       method: "POST",
       body: JSON.stringify(payload),
       headers: { "Content-Type": "application/json" },
-      credentials:'include'
+      credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => setAuth(data.token))
@@ -30,17 +29,25 @@ export default function JWTLogin() {
         Authorization: `Bearer ${auth}`,
       },
     });
-    if(profileData.status==401){
-        fetch("http://localhost:5000/refresh",{
-            method:'POST',
-            credentials: 'include',
-            
+    if (profileData.status == 401) {
+      const refreshResponse = await fetch("http://localhost:5000/refresh", {
+        method: "POST",
+        credentials: "include",
+      });
+      const refreshData = await refreshResponse.json();
+      if (refreshResponse.ok) {
+        setAuth(refreshData.token);
 
-        })
+        fetch("http://localhost:5000/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${refreshData.token}`,
+          },
+        });
+      }
     }
 
-
-    console.log(profileData)
+    console.log(profileData);
   }
 
   return (
